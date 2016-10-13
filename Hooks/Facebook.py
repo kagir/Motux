@@ -54,15 +54,13 @@ class Facebook:
         messages = []
         for post in posts['data']:
             if db_posts.find({'id': post['id']}).count() == 0:
-                # args = {'fields' : 'picture,full_picture,link,story,likes,attachments,type,icon,status_type,name,updated_time,created_time', }
-                args = {'fields': 'picture,full_picture,link,story,type,icon,status_type,name,updated_time,created_time,attachments,message', }
+                args = {'fields': 'picture,full_picture,link,story,type,icon,status_type,name,updated_time,created_time,attachments,message,caption', }
                 postData = self.__graph.get_object(post['id'], **args)
                 if postData.get('type') == 'event':
                     event_id = postData.get('attachments').get('data')[0].get('target').get('id')
                     event_obj = self.__graph.get_object(id=event_id)
                     postData['event_data'] = event_obj
-                #print(postData)
-                #db_posts.insert_one(postData)
+                db_posts.insert_one(postData)
                 messages.append(postData)
         return messages
 
@@ -75,7 +73,7 @@ class Facebook:
         :return: None
         """
         bot_action = {
-            'photo': lambda id, x: bot.sendPhoto(chat_id=id, photo=x.get('full_picture')),
+            'photo': lambda id, x: bot.sendPhoto(chat_id=id, photo=x.get('full_picture'), caption=x.get('attachments').get('data')[0].get('description')),
             'event': lambda id, x: bot.sendMessage(chat_id=id, text=x.get('event_data').get('description')),
             'link': lambda id, x: bot.sendMessage(chat_id=id, text=x.get('link')),
             'status': lambda id, x: bot.sendMessage(chat_id=id, text=x.get('message')),

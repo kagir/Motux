@@ -24,11 +24,12 @@ from Core import Bot
 import configparser
 import logging
 
-logging.basicConfig(level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
 
 if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read('config.ini')
+    logging.basicConfig(filename=config['LOG']['filename'], filemode='a', level=logging.INFO,
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     bot = Bot.Motux(config)
     bot.run()
