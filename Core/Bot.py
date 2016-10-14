@@ -20,9 +20,11 @@
 
 """This module contains the Motux class."""
 
+from telegram import InlineQueryResultArticle, InlineQueryResultVenue, ParseMode, InputTextMessageContent
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, InlineQueryHandler, CallbackQueryHandler, Job
 from telegram.error import (TelegramError, Unauthorized, BadRequest,
                             TimedOut, ChatMigrated, NetworkError)
+from uuid import uuid4
 from Hooks import Facebook
 import sys
 import importlib
@@ -98,6 +100,36 @@ class Motux:
             # handle all other telegram related errors
             pass
 
+    def getChatInfo(self,bot,update):
+        pass
+
+
+    def getInlineQuery(self, bot, update):
+        query = update.inline_query.query
+        results = list()
+        args = {'id': None, 'latitude': None, 'longitude': None, 'title': None, 'address': None,
+                'input_message_content': None}
+        if query.lower().strip() == 'talk':
+            args = {
+                'id': uuid4(),
+                'latitude': 40.637322,
+                'longitude': 17.02617132,
+                'title': "Evento LinuxDayMottola [Talk]",
+                'address': "Start 09:30, Via Peppino Impastato sn, Mottola",
+                'input_message_content':None
+            }
+        elif query.lower().strip() == 'party':
+            args = {
+                'id':uuid4(),
+                'latitude':40.6335226,
+                'longitude':17.04004839,
+                'title':"Evento LinuxDayMottola [Party]",
+                'address':"Start 15:30, Piazza Semeraro 9, Mottola",
+                'input_message_content':None
+            }
+        results.append(InlineQueryResultVenue(**args))
+        bot.answerInlineQuery(update.inline_query.id, results=results, cache_time=10)
+
     def run(self):
         """
 
@@ -109,14 +141,13 @@ class Motux:
 
         executeHandler = MessageHandler([Filters.text], self.executer)
         self.__dispatcher.add_handler(executeHandler)
-
+        self.__dispatcher.add_handler(InlineQueryHandler(self.getInlineQuery))
         self.__dispatcher.add_error_handler(self.error)
 
         # Define Job Queue
-        self.__job_queue = self.__updater.job_queue
-        for key, hook in self.__hooks.items():
-            self.__job_queue.put(Job(hook.get('hook').job, hook.get('timer'), True), next_t=0.0)
-
+        #self.__job_queue = self.__updater.job_queue
+        #for key, hook in self.__hooks.items():
+        #    self.__job_queue.put(Job(hook.get('hook').job, hook.get('timer'), True), next_t=0.0)
 
         # Start the Motux Bot
         self.__updater.start_polling(poll_interval=0.1, timeout=10, network_delay=5, clean=False)

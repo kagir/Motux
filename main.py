@@ -31,5 +31,7 @@ if __name__ == '__main__':
     config.read('config.ini')
     logging.basicConfig(filename=config['LOG']['filename'], filemode='a', level=logging.INFO,
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.info('Start MOTUX Bot.')
     bot = Bot.Motux(config)
     bot.run()
+
