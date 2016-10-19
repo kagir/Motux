@@ -62,7 +62,7 @@ class Facebook:
                     postData['event_data'] = event_obj
                 db_posts.insert_one(postData)
                 messages.append(postData)
-        return messages
+        return reversed(messages)
 
 
     def job(self,bot,jobs):

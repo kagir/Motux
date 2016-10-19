@@ -145,9 +145,9 @@ class Motux:
         self.__dispatcher.add_error_handler(self.error)
 
         # Define Job Queue
-        #self.__job_queue = self.__updater.job_queue
-        #for key, hook in self.__hooks.items():
-        #    self.__job_queue.put(Job(hook.get('hook').job, hook.get('timer'), True), next_t=0.0)
+        self.__job_queue = self.__updater.job_queue
+        for key, hook in self.__hooks.items():
+            self.__job_queue.put(Job(hook.get('hook').job, hook.get('timer'), True), next_t=0.0)
 
         # Start the Motux Bot
         self.__updater.start_polling(poll_interval=0.1, timeout=10, network_delay=5, clean=False)
